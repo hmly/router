@@ -3,12 +3,10 @@ An overview of the router program and its functionality.
 Programming Assignment 2
 Linked State Routing
 
-============
 Introduction
 ============
 The router program will run on multiple computers in order to accurately simulate a network of packet-switching programs, much like IP routers that forwards datagrams over the Internet. The software will determine the shortest-path routes through a network where routers may crash in order to send messages along these routers using link-state protocol and Dijkstra's algorithm for the calculation of the shortest path.
 
-=========
 Interface
 =========
 To start the router on an individual computer, execute the following commands:
@@ -27,14 +25,12 @@ The id is a number between 0 and 19 inclusive that should be unique over all pro
 
 For simplicity, the network described in the Makefile consist only of five routers where each router has at least one neighbor. To explicitly stop any of the running router, input the Ctrl+C command on the terminal. If the network has N routers then this process has to be done N times, otherwise the router will continue to run indefinitely as it was designed to do. The structure of the network can be changed, but remember that all routers have bi-directional links, thus if router A has a link to B then B also have a link to A.
 
-========
 Abstract
 ========
 The router program is a simple implementation of linked-state routing using datagrams with each router in the network maintaining a routing table of the costs to all other routers. The router will periodically send linked-state packet (LSP) to other routers in an attempt to verify that the connections the router has with its neighbors which are given as arguments when the router was initialized are still active. If a connection is inactive then one of its neighbors is most likely down and the router will update its routing table accordingly, in order to reflect the most recent state of the network. By doing so, the router will know ahead of time whether it is possible to send a packet to its neighbor routers and if it is not, then the router will immediately know to discard the packet since the destination is unreachable.
 
 There are two ways of running this router. The first possibility is to treat each router as a process and run multiple routers on the same computer, thus creating one of the most ideal network where the possibility of a down router and traffic is negligible. The second possibility is to run a copy of the program on multiple computers where the number of computers should be not greater than twenty. Each computer will represent a router ready to be initialized with a unique make instruction, the router will start pinging its neighbors and flooding the network with its routing table to get a sense of the structure of the network before sending packets to a specified destination.
 
-=========================
 Initialization of Routers
 =========================
 The make instruction which is unique for each router in the network is actually calling the router and passing the information about the router and its neighbors. The number of arguments (argc) should be at least two which actually initializes an isolated router and every subsequent argument must increase the argument count by two (to include host and port), thus the argument number will always be odd if the router is to be initialized properly.
@@ -43,7 +39,6 @@ After validating the correctness of the arguments, the router will create a Rout
 
 The router will then create and bind a socket to the specified port number and initialize the routing table. Four pthreads will be created and will perform the following operations: waiting for and processing incoming packets, periodically ping its neighbors, periodically send its routing table to its neighbors, and waiting for and accepting requests from the user to send a packet to a specified router in the network. By using pthreads, this allows the router to handle multiple tasks at once and does not require that all routers need to be synchronized. For example, if a new router joins the network and starts pinging even if its neighbors are busy, they will still be able to ping back.
 
-==========================
 The Cycle & Attributes of a Router
 ==========================
 At the beginning of the router's lifecycle, threads previously initialized have to wait a certain amount of seconds before starting its operation which in this case is either pinging or flooding since the other threads will only operate if there is an event. The time spent waiting is specified by their respective interval variable. The ping interval, set to 1 seconds, will always be less than the flood interval, set to 10 seconds, since the router needs to update its initially empty routing table before flooding the network. After the set amount of time has passed, the ping and flooding thread will start sending packets to the router's neighbors.
